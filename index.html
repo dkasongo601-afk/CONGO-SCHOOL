@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CONGO SCHOOL — Gestion scolaire</title>
+  <link rel="icon" href="icon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <img id="authLogo" src="logo-congo-school.jpg" class="auth-logo" alt="Logo Congo School">
+      <h1>CONGO SCHOOL</h1><p class="muted">Gestion des élèves et des paiements</p>
+      <div class="tabs"><button class="tab active" data-auth="login">Connexion</button><button class="tab" data-auth="register">Créer un compte</button></div>
+      <form id="authForm">
+        <div id="registerFields" class="hidden">
+          <label>Nom complet<input id="authFullName" placeholder="Nom et prénom" autocomplete="name"></label>
+          <label>Numéro de téléphone<input id="authPhone" type="tel" placeholder="+243 ..." autocomplete="tel"></label>
+          <label>Nom de l'école<input id="authSchool" placeholder="Ex. Institut Congo" autocomplete="organization"></label>
+        </div>
+        <label>Adresse e-mail<input id="authUser" type="email" required placeholder="vous@exemple.com" autocomplete="email"></label>
+        <label>Mot de passe<input id="authPass" type="password" required minlength="8" placeholder="Au moins 8 caractères" autocomplete="current-password"></label>
+        <button class="btn primary full" type="submit" id="authSubmit">Se connecter</button>
+      </form>
+      <p class="small muted">Compte sécurisé et données synchronisées en ligne avec Supabase.</p>
+      <p id="authMessage" class="message"></p>
+    </div>
+  </section>
+
+  <div id="app" class="app hidden">
+    <aside class="sidebar">
+      <div class="brand"><img id="sideLogo" src="logo-congo-school.jpg" alt=""><div><b id="sideSchool">CONGO SCHOOL</b><small>Gestion scolaire</small></div></div>
+      <nav>
+        <button class="nav-link active" data-page="dashboard">▦ <span>Tableau de bord</span></button>
+        <button class="nav-link" data-page="students">♙ <span>Élèves</span></button>
+        <button class="nav-link" data-page="payments">₣ <span>Paiements</span></button>
+        <button class="nav-link" data-page="school">⌂ <span>École</span></button>
+        <button class="nav-link" data-page="settings">⚙ <span>Paramètres</span></button>
+      </nav>
+      <button id="logoutBtn" class="btn outline full logout">Déconnexion</button>
+    </aside>
+    <main class="main">
+      <header class="topbar"><div><h2 id="pageTitle">Tableau de bord</h2><p id="todayText" class="muted"></p></div><div class="user-pill"><span class="online-dot"></span><span id="currentUser">Administrateur</span></div></header>
+
+      <section class="page" id="page-dashboard">
+        <div class="welcome"><div><p class="eyebrow">BIENVENUE DANS</p><h1 id="welcomeSchool">CONGO SCHOOL</h1><p>Suivez les inscriptions et les paiements de votre établissement.</p></div><img id="dashLogo" src="logo-congo-school.jpg" alt="Logo"></div>
+        <div class="stats">
+          <article class="stat-card"><span class="stat-icon">♙</span><div><p>Élèves inscrits</p><strong id="statStudents">0</strong></div></article>
+          <article class="stat-card"><span class="stat-icon">₣</span><div><p>Total encaissé</p><strong id="statPaid">0 FC</strong></div></article>
+          <article class="stat-card"><span class="stat-icon">▤</span><div><p>Paiements enregistrés</p><strong id="statPayments">0</strong></div></article>
+          <article class="stat-card"><span class="stat-icon">↘</span><div><p>Élèves abandonnés</p><strong id="statAbandoned">0</strong></div></article>
+        </div>
+        <div class="panel"><div class="panel-head"><div><h3>Répartition par classe</h3><p class="muted">Nombre d'élèves inscrits dans chaque classe</p></div><button class="btn secondary" data-goto="students">+ Ajouter un élève</button></div><div id="classDistribution" class="class-grid"></div></div>
+        <div class="panel"><div class="panel-head"><div><h3>Derniers paiements</h3><p class="muted">Les opérations les plus récentes</p></div><button class="btn outline" data-goto="payments">Voir tout</button></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Élève</th><th>Classe</th><th>Motif</th><th>Montant</th></tr></thead><tbody id="recentPayments"></tbody></table></div></div>
+      </section>
+
+      <section class="page hidden" id="page-students">
+        <div class="panel"><div class="panel-head"><div><h3>Enregistrer un élève</h3><p class="muted">Remplissez les informations de l'élève.</p></div></div>
+          <form id="studentForm" class="form-grid">
+            <input type="hidden" id="studentId">
+            <label>Nom <input id="studentLast" required placeholder="Nom de famille"></label>
+            <label>Post-nom<input id="studentMiddle" placeholder="Post-nom"></label>
+            <label>Prénom <input id="studentFirst" required placeholder="Prénom"></label>
+            <label>Classe <select id="studentClass" required></select></label>
+            <label>Option (si applicable)<input id="studentOption" placeholder="Saisir l'option librement"></label>
+            <label>Sexe<select id="studentSex"><option value="">Sélectionner</option><option>Masculin</option><option>Féminin</option></select></label>
+            <label>Statut<select id="studentStatus"><option value="Actif">Actif</option><option value="Abandonné">Abandonné</option></select></label>
+            <div class="form-actions"><button class="btn primary" type="submit" id="saveStudentBtn">Enregistrer l'élève</button><button class="btn outline" type="button" id="cancelStudentEdit">Annuler</button></div>
+          </form>
+        </div>
+        <div class="panel"><div class="panel-head responsive-head"><div><h3>Liste des élèves</h3><p class="muted">Rechercher, modifier ou supprimer un élève.</p></div><input id="studentSearch" class="search" placeholder="Rechercher un élève..."></div>
+          <div class="table-wrap"><table><thead><tr><th>Nom complet</th><th>Classe</th><th>Option</th><th>Sexe</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="studentsTable"></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="page hidden" id="page-payments">
+        <div class="panel"><div class="panel-head"><div><h3>Enregistrer un paiement</h3><p class="muted">Le solde est calculé automatiquement à partir des paiements enregistrés.</p></div></div>
+          <form id="paymentForm" class="form-grid">
+            <label>Classe <select id="paymentClass" required></select></label>
+            <label>Élève <select id="paymentStudent" required><option value="">Sélectionner d'abord la classe</option></select></label>
+            <label>Nom<input id="payLast" readonly></label><label>Post-nom<input id="payMiddle" readonly></label>
+            <label>Prénom<input id="payFirst" readonly></label><label>Option<input id="payOption" readonly></label>
+            <label>Total à payer (FC) <input id="payTotal" type="number" min="0" step="1" required placeholder="Montant total attendu"></label>
+            <label>Déjà payé (FC)<input id="payAlready" readonly value="0"></label>
+            <label>Reste avant ce paiement<input id="payRemaining" readonly value="0"></label>
+            <label>Montant payé aujourd'hui (FC) <input id="payAmount" type="number" min="1" step="1" required placeholder="Montant reçu"></label>
+            <label>Motif <select id="payReason" required><option value="">Choisir le motif</option><option>Inscription</option><option>Frais scolaires</option><option>Frais de l'État — 1ère tranche</option><option>Frais de l'État — 2ème tranche</option><option>Frais de l'État — 3ème tranche</option><option>Bulletin</option><option>Exetat</option><option>Examen scolaire</option><option>Autres frais</option></select></label>
+            <label>Mois concerné(s)<input id="payMonths" placeholder="Ex. septembre, octobre"></label>
+            <label>Date du paiement<input id="payDate" type="date" required></label>
+            <div class="form-actions"><button class="btn primary" type="submit">Enregistrer le paiement</button><button class="btn outline" type="button" id="resetPayment">Effacer</button></div>
+          </form>
+          <p id="paymentMessage" class="message"></p>
+        </div>
+        <div class="panel"><div class="panel-head responsive-head"><div><h3>Historique des paiements</h3><p class="muted">Imprimez un reçu ou supprimez une opération.</p></div><input id="paymentSearch" class="search" placeholder="Rechercher un paiement..."></div>
+          <div class="table-wrap"><table><thead><tr><th>Date</th><th>Élève</th><th>Classe</th><th>Motif</th><th>Payé</th><th>Reste après paiement</th><th>Actions</th></tr></thead><tbody id="paymentsTable"></tbody></table></div>
+          <div class="table-footer"><button id="clearPayments" class="btn danger">Supprimer tout l'historique</button><small class="muted">Cette action est irréversible.</small></div>
+        </div>
+      </section>
+
+      <section class="page hidden" id="page-school">
+        <div class="panel narrow"><div class="panel-head"><div><h3>Informations de l'école</h3><p class="muted">Personnalisez l'identité de votre établissement.</p></div></div>
+          <form id="schoolForm" class="school-form">
+            <div class="logo-preview-wrap"><img id="schoolLogoPreview" src="logo-congo-school.jpg" alt="Logo de l'école"><div><b>Logo de l'école</b><p class="muted small">Image JPG, PNG ou WebP.</p><label class="btn secondary file-label">Choisir un logo<input type="file" id="schoolLogoFile" accept="image/*" hidden></label><button type="button" class="btn outline" id="removeLogo">Retirer le logo</button></div></div>
+            <label>Nom de l'école <input id="schoolName" required placeholder="Nom de l'établissement"></label>
+            <button class="btn primary" type="submit">Enregistrer les informations</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="page hidden" id="page-settings">
+        <div class="panel narrow"><div class="panel-head"><div><h3>Paramètres</h3><p class="muted">Réglez l'apparence et vérifiez les données.</p></div></div>
+          <div class="settings-list">
+            <div class="setting-row"><div><b>Couleur de l'application</b><p class="muted">Le bleu et le blanc sont les couleurs par défaut.</p></div><select id="themeSelect"><option value="blue">Bleu & blanc</option><option value="navy">Bleu nuit</option><option value="green">Vert</option></select></div>
+            <div class="setting-row"><div><b>Région / devise</b><p class="muted">Utilisée pour l'affichage des montants.</p></div><select id="currencySelect"><option value="FC">Franc congolais (FC)</option><option value="USD">Dollar américain (USD)</option></select></div>
+            <div class="setting-row"><div><b>Vérifier les élèves mal enregistrés</b><p class="muted">Recherche les noms ou classes manquants.</p></div><button class="btn secondary" id="checkStudents">Vérifier</button></div>
+            <div class="setting-row"><div><b>Régler la date</b><p class="muted">La date et l'heure du tableau de bord suivent l'appareil.</p></div><button class="btn outline" id="refreshDate">Actualiser</button></div>
+            <div class="setting-row"><div><b>Exporter une sauvegarde</b><p class="muted">Télécharger vos élèves et paiements en JSON.</p></div><button class="btn secondary" id="exportData">Exporter</button></div>
+          </div><p id="settingsMessage" class="message"></p>
+        </div>
+      </section>
+      <footer>© <span id="year"></span> CONGO SCHOOL · Gestion scolaire</footer>
+    </main>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+</body>
+</html>

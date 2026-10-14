@@ -1,0 +1,43 @@
+{
+  "name": "congo-school",
+  "version": "1.0.0",
+  "description": "CONGO SCHOOL — application de gestion scolaire",
+  "main": "main.js",
+  "author": "CONGO SCHOOL",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis"
+  },
+  "devDependencies": {
+    "electron": "^37.2.6",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "cd.congoschool.app",
+    "productName": "CONGO SCHOOL",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "style.css",
+      "script.js",
+      "main.js",
+      "package.json",
+      "logo-congo-school.jpg",
+      "icon.ico"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "CONGO SCHOOL"
+    }
+  }
+}

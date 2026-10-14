@@ -1,0 +1,2 @@
+Configuration terminée dans SUPABASE-SETUP.sql.
+Exécuter ce script dans Supabase > SQL Editor avant d'utiliser l'inscription et la synchronisation en ligne.
